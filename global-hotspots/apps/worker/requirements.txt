@@ -1,0 +1,4 @@
+celery==5.5.3
+redis==6.4.0
+httpx==0.28.1
+feedparser==6.0.11
