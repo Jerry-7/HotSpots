@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,6 +9,7 @@ from app.api.routes.rankings import router as rankings_router
 from app.api.routes.settings import router as settings_router
 from app.api.routes.sources import router as sources_router
 from app.core.config import settings
+from app.core.logging import setup_file_logging
 from app.db.base import Base
 from app.db.session import engine
 from app.models import ai_provider_key, email_otp, event, event_score, runtime_setting, source, source_config, user
@@ -26,6 +29,8 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup() -> None:
+    log_file = setup_file_logging(settings.api_log_dir, settings.api_log_file, settings.api_log_level)
+    logging.getLogger(__name__).info("API logging initialized at %s", log_file)
     Base.metadata.create_all(bind=engine)
     seed_sources()
     if settings.source_seed_demo_data:
