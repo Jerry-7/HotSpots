@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     source_proxy_url: str | None = None
     source_connect_timeout_seconds: float = 8.0
     source_seed_demo_data: bool = False
+    api_log_dir: str = "/var/log"
+    api_log_file: str = "global-hotspots-api.log"
+    api_log_level: str = "INFO"
 
 
 settings = Settings()

@@ -40,6 +40,9 @@ Monorepo for a global-hotspots web app MVP.
 - `SOURCE_PROXY_URL`: optional outbound proxy for source fetch/connectivity checks (e.g. `http://127.0.0.1:7890`).
 - `SOURCE_CONNECT_TIMEOUT_SECONDS`: source request timeout seconds.
 - `SOURCE_SEED_DEMO_DATA`: set `true` only if you want startup demo events.
+- `API_LOG_DIR`: backend log directory, default `/var/log`.
+- `API_LOG_FILE`: backend log file name, default `global-hotspots-api.log`.
+- `API_LOG_LEVEL`: backend log level (`DEBUG/INFO/WARNING/ERROR`).
 - `API_BASE_URL`: worker callback API base URL (default `http://localhost:8000`).
 - `API_REFRESH_TOKEN`: worker bearer token for refresh endpoint (default `demo-token`).
 
