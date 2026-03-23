@@ -6,12 +6,14 @@ import {
   getSourceConnectivity,
   listProviders,
   listSources,
+  previewSource,
   refreshEvents,
   setRuntimeProxy,
   upsertProvider,
   updateSourceConfig,
   type ProviderItem,
   type SourceConnectivityItem,
+  type SourcePreviewOut,
   type SourceItem,
 } from "../../lib/api";
 
@@ -29,6 +31,8 @@ export default function SettingsPage() {
   const [proxyUrl, setProxyUrl] = useState("");
   const [proxyMessage, setProxyMessage] = useState("");
   const [connectivity, setConnectivity] = useState<Record<number, SourceConnectivityItem>>({});
+  const [previewData, setPreviewData] = useState<Record<number, SourcePreviewOut>>({});
+  const [previewMessage, setPreviewMessage] = useState<Record<number, string>>({});
 
   async function refreshAll() {
     setLoading(true);
@@ -135,6 +139,17 @@ export default function SettingsPage() {
     if (item.status === "ok") return "text-emerald-300";
     if (item.status === "skipped") return "text-amber-300";
     return "text-rose-300";
+  }
+
+  async function onPreviewSource(sourceId: number) {
+    setPreviewMessage((prev) => ({ ...prev, [sourceId]: "测试拉取中..." }));
+    try {
+      const data = await previewSource(sourceId, 5);
+      setPreviewData((prev) => ({ ...prev, [sourceId]: data }));
+      setPreviewMessage((prev) => ({ ...prev, [sourceId]: data.status === "ok" ? `拉取成功，预览 ${data.count} 条` : `拉取失败: ${data.detail || ""}` }));
+    } catch {
+      setPreviewMessage((prev) => ({ ...prev, [sourceId]: "拉取失败，请检查网络/代理/来源地址" }));
+    }
   }
 
   return (
@@ -308,13 +323,33 @@ export default function SettingsPage() {
               </div>
 
               <div className="mt-3">
-                <button
-                  type="button"
-                  onClick={() => void saveSource(item.source_id)}
-                  className="rounded-lg bg-teal-500 px-4 py-2 text-sm text-white"
-                >
-                  保存来源配置
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void saveSource(item.source_id)}
+                    className="rounded-lg bg-teal-500 px-4 py-2 text-sm text-white"
+                  >
+                    保存来源配置
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void onPreviewSource(item.source_id)}
+                    className="rounded-lg bg-sky-600 px-4 py-2 text-sm text-white"
+                  >
+                    测试拉取
+                  </button>
+                </div>
+                {previewMessage[item.source_id] ? <div className="mt-2 text-xs text-sky-300">{previewMessage[item.source_id]}</div> : null}
+                {previewData[item.source_id]?.items?.length ? (
+                  <div className="mt-2 space-y-2 rounded-lg border border-slate-700 bg-slate-900/70 p-2">
+                    {previewData[item.source_id].items.map((preview, idx) => (
+                      <div key={`${item.source_id}-${idx}`} className="rounded border border-slate-700 bg-slate-800/60 p-2">
+                        <div className="text-sm font-medium text-slate-100">{preview.title}</div>
+                        <div className="mt-1 text-xs text-slate-300">{preview.summary}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             </div>
           ))}

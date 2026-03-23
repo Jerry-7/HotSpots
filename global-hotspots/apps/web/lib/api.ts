@@ -66,6 +66,18 @@ export type SourceConnectivityItem = {
   detail: string | null;
 };
 
+export type SourcePreviewOut = {
+  source_id: number;
+  source_name: string;
+  status: "ok" | "error";
+  count: number;
+  detail: string | null;
+  items: Array<{
+    title: string;
+    summary: string;
+  }>;
+};
+
 export async function listProviders() {
   return request<ProviderItem[]>("/api/v1/settings/ai-providers", { revalidate: false });
 }
@@ -130,4 +142,10 @@ export async function setRuntimeProxy(source_proxy_url: string | null) {
 
 export async function getSourceConnectivity() {
   return request<SourceConnectivityItem[]>("/api/v1/sources/connectivity", { revalidate: false });
+}
+
+export async function previewSource(sourceId: number, limit = 5) {
+  return request<SourcePreviewOut>(`/api/v1/sources/${sourceId}/preview?limit=${limit}`, {
+    method: "POST",
+  });
 }

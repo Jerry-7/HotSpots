@@ -141,4 +141,4 @@ def refresh_events(
         wait_seconds = int(REFRESH_COOLDOWN_SECONDS - (now - last_called)) + 1
         raise HTTPException(status_code=429, detail=f"Refresh too frequent, retry in {wait_seconds}s")
     _refresh_last_called[user.id] = now
-    return run_full_refresh(db)
+    return run_full_refresh(db, user_id=user.id)

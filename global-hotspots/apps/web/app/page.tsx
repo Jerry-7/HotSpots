@@ -1,4 +1,5 @@
 import { GlobeView } from "../components/globe-view";
+import { RefreshHotspotsButton } from "../components/refresh-hotspots-button";
 import { getGlobePoints, getHotspots } from "../lib/api";
 
 const windows = ["1h", "6h", "24h", "7d", "30d"];
@@ -25,7 +26,8 @@ export default async function HomePage({
       <section className="rounded-2xl border border-slate-700 bg-slate-900/60 p-4">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-xl font-semibold">全球热点地球</h1>
-          <div className="flex gap-2 text-sm">
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <RefreshHotspotsButton />
             {windows.map((item) => (
               <a
                 key={item}

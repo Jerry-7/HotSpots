@@ -22,6 +22,20 @@ class SourceConnectivityItem(BaseModel):
     detail: str | None = None
 
 
+class SourcePreviewItem(BaseModel):
+    title: str
+    summary: str
+
+
+class SourcePreviewOut(BaseModel):
+    source_id: int
+    source_name: str
+    status: str
+    count: int
+    detail: str | None = None
+    items: list[SourcePreviewItem]
+
+
 class UpdateSourceConfigIn(BaseModel):
     enabled: bool | None = None
     weight: float | None = None

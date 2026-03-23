@@ -6,7 +6,7 @@ class Settings(BaseSettings):
 
     app_env: str = "development"
     app_debug: bool = True
-    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/hotspots"
+    database_url: str = "postgresql+psycopg://postgres:postgres@192.168.0.241:5432/hotspots"
     jwt_secret_key: str = "change-me"
     jwt_expire_minutes: int = 1440
     otp_expire_minutes: int = 10

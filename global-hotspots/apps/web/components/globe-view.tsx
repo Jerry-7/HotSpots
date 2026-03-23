@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
 
@@ -15,12 +16,40 @@ type GlobePoint = {
 };
 
 export function GlobeView({ points }: { points: GlobePoint[] }) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const globeRef = useRef<any>(null);
+  const [dimensions, setDimensions] = useState({ width: 900, height: 520 });
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver(() => {
+      const width = Math.max(320, Math.floor(container.clientWidth));
+      const height = Math.max(360, Math.floor(container.clientHeight));
+      setDimensions({ width, height });
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  const centeredPoints = useMemo(() => points, [points]);
+
+  useEffect(() => {
+    if (!globeRef.current) return;
+    globeRef.current.pointOfView({ lat: 18, lng: 0, altitude: 2.1 }, 0);
+  }, [dimensions.width, dimensions.height]);
+
   return (
-    <div className="h-[520px] overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/70">
+    <div ref={containerRef} className="h-[520px] overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/70">
+      <div className="flex h-full w-full items-center justify-center">
       <Globe
+        ref={globeRef}
+        width={dimensions.width}
+        height={dimensions.height}
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
         backgroundColor="rgba(0,0,0,0)"
-        pointsData={points}
+        pointsData={centeredPoints}
         pointLat="lat"
         pointLng="lng"
         pointLabel={(d: object) => {
@@ -39,6 +68,7 @@ export function GlobeView({ points }: { points: GlobePoint[] }) {
           return "#38bdf8";
         }}
       />
+      </div>
     </div>
   );
 }

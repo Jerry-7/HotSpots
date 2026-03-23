@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
@@ -6,8 +6,8 @@ from app.api.deps import current_user, db_session
 from app.models.source import Source
 from app.models.source_config import SourceConfig
 from app.models.user import User
-from app.schemas.sources import SourceConnectivityItem, SourceItem, UpdateSourceConfigIn
-from app.services.ingest_pipeline import check_source_connectivity
+from app.schemas.sources import SourceConnectivityItem, SourceItem, SourcePreviewOut, UpdateSourceConfigIn
+from app.services.ingest_pipeline import check_source_connectivity, preview_source_fetch
 
 
 router = APIRouter(prefix="/sources", tags=["sources"])
@@ -86,3 +86,14 @@ def source_connectivity(
     _ = user
     rows = check_source_connectivity(db)
     return [SourceConnectivityItem(**row) for row in rows]
+
+
+@router.post("/{source_id}/preview", response_model=SourcePreviewOut)
+def source_preview(
+    source_id: int,
+    limit: int = Query(5, ge=1, le=20),
+    user: User = Depends(current_user),
+    db: Session = Depends(db_session),
+) -> SourcePreviewOut:
+    _ = user
+    return SourcePreviewOut(**preview_source_fetch(db, source_id=source_id, limit=limit))
